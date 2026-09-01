@@ -1,0 +1,4 @@
+razorpay>=1.4.2
+fastapi
+uvicorn
+python-dotenv
