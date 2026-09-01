@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agentic Commerce — Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0C1016; --panel:#141A22; --panel-2:#10151C; --border:#232B36;
+    --text:#E8ECF1; --muted:#8592A3; --amber:#E3A63E; --green:#35B383;
+    --red:#E1543F; --blue:#5B8DEF;
+    --mono:'JetBrains Mono', monospace; --sans:'IBM Plex Sans', system-ui, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--text); font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;
+  }
+  header{
+    padding:20px 28px; border-bottom:1px solid var(--border);
+    display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:12px;
+  }
+  header h1{
+    font-family:var(--mono); font-size:15px; letter-spacing:0.12em; margin:0;
+    text-transform:uppercase; font-weight:700;
+  }
+  header .merchant{color:var(--muted); font-size:12px; font-family:var(--mono); margin-top:4px;}
+  .badges{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+  .badge{
+    font-family:var(--mono); font-size:11px; padding:4px 9px; border-radius:3px;
+    border:1px solid var(--border); color:var(--muted); background:var(--panel-2);
+  }
+  .badge.llm{color:var(--green); border-color:var(--green);}
+  .badge.heuristic{color:var(--amber); border-color:var(--amber);}
+  main{
+    display:grid; grid-template-columns: 1.1fr 1.3fr 1.3fr; gap:1px;
+    background:var(--border); min-height:calc(100vh - 78px);
+  }
+  @media (max-width: 1000px){ main{grid-template-columns:1fr;} }
+  section{background:var(--bg); padding:20px;}
+  .col-title{
+    font-family:var(--mono); font-size:11px; letter-spacing:0.14em; color:var(--muted);
+    text-transform:uppercase; margin:0 0 14px 0; display:flex; justify-content:space-between; align-items:center;
+  }
+  .product{
+    border:1px solid var(--border); border-radius:6px; padding:12px 14px; margin-bottom:10px;
+    background:var(--panel);
+  }
+  .product .row1{display:flex; justify-content:space-between; align-items:baseline; gap:8px;}
+  .product .name{font-weight:600; font-size:13.5px;}
+  .product .price{font-family:var(--mono); color:var(--text); font-size:13px;}
+  .product .desc{color:var(--muted); font-size:12px; margin-top:4px;}
+  .product .meta{margin-top:8px; display:flex; gap:6px; flex-wrap:wrap;}
+  .tag{font-family:var(--mono); font-size:10px; padding:2px 6px; border-radius:3px; border:1px solid var(--border); color:var(--muted);}
+  .tag.stock-out{color:var(--red); border-color:var(--red);}
+  .tag.no-agent{color:var(--amber); border-color:var(--amber);}
+  label{display:block; font-family:var(--mono); font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:6px;}
+  input, textarea{
+    width:100%; background:var(--panel-2); border:1px solid var(--border); color:var(--text);
+    padding:9px 10px; border-radius:5px; font-family:var(--sans); font-size:13px; margin-bottom:14px;
+  }
+  input:focus, textarea:focus{outline:none; border-color:var(--blue);}
+  button{
+    font-family:var(--mono); font-size:12px; letter-spacing:0.04em; padding:10px 16px;
+    border-radius:5px; border:1px solid var(--blue); background:transparent; color:var(--blue);
+    cursor:pointer; margin-right:8px; margin-bottom:8px; transition:background .15s,color .15s;
+  }
+  button:hover{background:var(--blue); color:#081018;}
+  button.ghost{border-color:var(--border); color:var(--muted);}
+  button.ghost:hover{background:var(--panel); color:var(--text);}
+  button.danger{border-color:var(--red); color:var(--red);}
+  button.danger:hover{background:var(--red); color:#081018;}
+  .decision-card{
+    margin-top:16px; border:1px solid var(--border); border-radius:6px; padding:14px;
+    background:var(--panel);
+  }
+  .decision-card.success{border-color:var(--green);}
+  .decision-card.fail{border-color:var(--red);}
+  .decision-card.escalated{border-color:var(--amber);}
+  .decision-summary{font-family:var(--sans); font-size:13.5px; line-height:1.5;}
+  .decision-card.success .decision-summary{color:var(--green);}
+  .decision-card.fail .decision-summary{color:var(--red);}
+  .decision-card.escalated .decision-summary{color:var(--amber);}
+  .raw-toggle{margin-top:10px;}
+  .raw-toggle summary{
+    font-family:var(--mono); font-size:10.5px; color:var(--muted); cursor:pointer;
+    text-transform:uppercase; letter-spacing:0.06em;
+  }
+  .raw-toggle pre{
+    margin:8px 0 0 0; font-family:var(--mono); font-size:11px; color:var(--muted);
+    white-space:pre-wrap; word-break:break-word; background:var(--panel-2); padding:10px;
+    border-radius:4px; border:1px solid var(--border);
+  }
+  .scenarios{margin-top:22px; padding-top:16px; border-top:1px solid var(--border);}
+  .ledger{position:relative; padding-left:14px;}
+  .ledger-divider{
+    font-family:var(--mono); font-size:10px; color:var(--blue); text-transform:uppercase;
+    letter-spacing:0.1em; margin:18px 0 10px -14px; padding-bottom:6px;
+    border-bottom:1px solid var(--border);
+  }
+  .ledger-divider:first-child{margin-top:0;}
+  .entry{
+    position:relative; margin-bottom:0; padding:10px 0 10px 14px; border-left:2px solid var(--border);
+  }
+  .entry:last-child{border-left:2px solid transparent;}
+  .entry::before{
+    content:''; position:absolute; left:-6px; top:14px; width:10px; height:10px; border-radius:50%;
+    background:var(--panel-2); border:2px solid var(--blue);
+  }
+  .entry .etype{font-family:var(--mono); font-size:11.5px; font-weight:700; letter-spacing:0.03em;}
+  .entry .etype.payment_succeeded, .entry .etype.purchase_intent{color:var(--green);}
+  .entry .etype.payment_declined, .entry .etype.purchase_rejected{color:var(--red);}
+  .entry .etype.escalated_to_human, .entry .etype.bound_check{color:var(--amber);}
+  .entry .epayload{color:var(--muted); font-size:11.5px; font-family:var(--mono); margin-top:3px; line-height:1.5;}
+  .entry .ehash{color:#4A5568; font-size:10px; font-family:var(--mono); margin-top:4px;}
+  .stamp{
+    margin-top:18px; padding:14px; border-radius:6px; text-align:center; font-family:var(--mono);
+    font-size:12px; letter-spacing:0.08em; border:1px dashed var(--border); color:var(--muted);
+  }
+  .stamp.valid{border-color:var(--green); color:var(--green);}
+  .stamp.invalid{border-color:var(--red); color:var(--red);}
+  .empty{color:var(--muted); font-size:12px; font-family:var(--mono); padding:20px 0; text-align:center;}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Agentic Commerce — Ledger</h1>
+    <div class="merchant" id="merchant-name">merchant: —</div>
+  </div>
+  <div class="badges">
+    <span class="badge" id="mode-badge">mode: —</span>
+    <span class="badge" id="cap-badge">caps: —</span>
+    <button class="ghost" onclick="resetDemo()" style="margin:0;">↺ reset</button>
+  </div>
+</header>
+
+<main>
+  <section>
+    <p class="col-title">Catalog</p>
+    <div id="catalog-list"><div class="empty">loading…</div></div>
+  </section>
+
+  <section>
+    <p class="col-title">Buyer Agent</p>
+    <label for="goal">Shopping goal</label>
+    <input id="goal" type="text" value="I need something to carry water on a hike">
+    <label for="budget">Budget (₹)</label>
+    <input id="budget" type="number" value="1000">
+    <button onclick="sendBuyerAgent()">Send buyer agent to shop →</button>
+    <div id="decision-output"></div>
+
+    <div class="scenarios">
+      <p class="col-title">Force a scenario</p>
+      <button class="danger" onclick="forceScenario('decline')">Force declined payment</button>
+      <button class="ghost" onclick="forceScenario('oos')">Try out-of-stock item</button>
+      <button class="ghost" onclick="forceScenario('over-bound')">Try item over the bound</button>
+    </div>
+  </section>
+
+  <section>
+    <p class="col-title">Audit Trail <span id="entry-count" style="color:var(--muted); font-weight:400;"></span></p>
+    <div class="ledger" id="ledger-list"><div class="empty">no entries yet</div></div>
+    <div class="stamp" id="verify-stamp">chain not yet verified</div>
+  </section>
+</main>
+
+<script>
+const fmtPaise = p => '₹' + (p/100).toFixed(2);
+const truncHash = h => h ? h.slice(0,10) + '…' : '';
+
+async function loadConfig(){
+  const cfg = await (await fetch('/api/config')).json();
+  const modeBadge = document.getElementById('mode-badge');
+  modeBadge.textContent = 'mode: ' + cfg.mode;
+  modeBadge.className = 'badge ' + cfg.mode;
+  document.getElementById('cap-badge').textContent =
+    `caps: ${fmtPaise(cfg.per_order_cap_paise)} auto / ${fmtPaise(cfg.hard_cap_paise)} hard`;
+}
+
+let catalogBySku = {};
+
+async function loadCatalog(){
+  const data = await (await fetch('/api/catalog')).json();
+  catalogBySku = {};
+  for(const p of data.products) catalogBySku[p.sku] = p;
+  document.getElementById('merchant-name').textContent = 'merchant: ' + data.merchant.name;
+  const list = document.getElementById('catalog-list');
+  list.innerHTML = '';
+  for(const p of data.products){
+    const div = document.createElement('div');
+    div.className = 'product';
+    div.innerHTML = `
+      <div class="row1"><span class="name">${p.name}</span><span class="price">${fmtPaise(p.price_paise)}</span></div>
+      <div class="desc">${p.description}</div>
+      <div class="meta">
+        <span class="tag ${p.stock<=0?'stock-out':''}">${p.stock<=0?'out of stock':'stock: '+p.stock}</span>
+        <span class="tag ${!p.agent_purchasable?'no-agent':''}">${p.agent_purchasable?'agent-purchasable':'not agent-purchasable'}</span>
+        <span class="tag">${p.sku}</span>
+      </div>`;
+    list.appendChild(div);
+  }
+}
+
+async function loadLedger(){
+  const data = await (await fetch('/api/audit')).json();
+  const list = document.getElementById('ledger-list');
+  document.getElementById('entry-count').textContent = `(${data.entries.length})`;
+  if(data.entries.length === 0){ list.innerHTML = '<div class="empty">no entries yet</div>'; }
+  else {
+    list.innerHTML = '';
+    let lastRequestId = null;
+    let actionNum = 0;
+    for(const e of data.entries){
+      if(e.request_id !== lastRequestId){
+        actionNum++;
+        lastRequestId = e.request_id;
+        const divider = document.createElement('div');
+        divider.className = 'ledger-divider';
+        const time = new Date(e.ts * 1000).toLocaleTimeString();
+        divider.textContent = `action ${actionNum} · ${time}`;
+        list.appendChild(divider);
+      }
+      const div = document.createElement('div');
+      div.className = 'entry';
+      const payloadStr = Object.entries(e.payload).map(([k,v])=>`${k}: ${JSON.stringify(v)}`).join('  ·  ');
+      div.innerHTML = `
+        <div class="etype ${e.event_type}">${e.event_type}</div>
+        <div class="epayload">${payloadStr}</div>
+        <div class="ehash">${truncHash(e.prev_hash)} → ${truncHash(e.entry_hash)}</div>`;
+      list.appendChild(div);
+    }
+  }
+  const v = await (await fetch('/api/verify')).json();
+  const stamp = document.getElementById('verify-stamp');
+  if(v.valid){ stamp.textContent = '✓ CHAIN VERIFIED — no tampering detected'; stamp.className = 'stamp valid'; }
+  else { stamp.textContent = '✕ CHAIN BROKEN — ' + v.error; stamp.className = 'stamp invalid'; }
+}
+
+function summarize(result){
+  const r = result.result;
+  const product = catalogBySku[result.sku];
+  const label = product ? product.name : (result.sku || 'item');
+
+  if(result.action === 'no_purchase'){
+    return {cls:'fail', icon:'—', text:`No purchase made — ${result.reason}`};
+  }
+  if(!r) return {cls:'fail', icon:'?', text:'Unexpected response.'};
+
+  if(r.success){
+    const price = product ? '₹' + (product.price_paise/100).toFixed(2) : '';
+    return {cls:'success', icon:'✓', text:`Purchased ${label}${price ? ' for '+price : ''}. Order ${r.order_id}.`};
+  }
+  if(r.escalated){
+    if(r.escalation_type === 'confirmation_required'){
+      return {cls:'escalated', icon:'⚠', text:`Needs your approval — ${r.reason}`};
+    }
+    return {cls:'escalated', icon:'⚠', text:`Escalated (no fix available) — ${r.reason}`};
+  }
+  return {cls:'fail', icon:'✗', text:`Rejected — ${r.reason}`};
+}
+
+function renderDecision(result){
+  const out = document.getElementById('decision-output');
+  const s = summarize(result);
+  const div = document.createElement('div');
+  div.className = 'decision-card ' + s.cls;
+
+  const summaryLine = document.createElement('div');
+  summaryLine.className = 'decision-summary';
+  summaryLine.textContent = `${s.icon} ${s.text}`;
+  div.appendChild(summaryLine);
+
+  const r = result.result;
+  if(r && r.escalated && r.escalation_type === 'confirmation_required'){
+    const approveBtn = document.createElement('button');
+    approveBtn.textContent = 'Approve as human \u2192 complete purchase';
+    approveBtn.style.marginTop = '10px';
+    approveBtn.onclick = async () => {
+      approveBtn.disabled = true;
+      approveBtn.textContent = 'Processing\u2026';
+      const res = await fetch('/api/checkout', {
+        method:'POST', headers:{'content-type':'application/json'},
+        body: JSON.stringify({sku: result.sku, qty: result.qty || 1, human_confirmed: true})
+      });
+      const data = await res.json();
+      renderDecision({action:'human_approved', sku: result.sku, qty: result.qty || 1, result: data});
+      await loadCatalog();
+      await loadLedger();
+    };
+    div.appendChild(approveBtn);
+  }
+
+  const details = document.createElement('details');
+  details.className = 'raw-toggle';
+  const summaryTag = document.createElement('summary');
+  summaryTag.textContent = 'view raw JSON';
+  const pre = document.createElement('pre');
+  pre.textContent = JSON.stringify(result, null, 2);
+  details.appendChild(summaryTag);
+  details.appendChild(pre);
+  div.appendChild(details);
+
+  out.prepend(div);
+}
+
+async function sendBuyerAgent(){
+  const goal = document.getElementById('goal').value;
+  const budget_paise = Math.round(parseFloat(document.getElementById('budget').value) * 100);
+  const res = await fetch('/api/shop', {method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify({goal, budget_paise})});
+  const data = await res.json();
+  renderDecision(data);
+  await loadCatalog();
+  await loadLedger();
+}
+
+async function forceScenario(kind){
+  let body;
+  if(kind === 'decline') body = {sku:'NW-BTL-002', qty:1, force_outcome:'decline'};
+  if(kind === 'oos') body = {sku:'NW-MUG-005', qty:1};
+  if(kind === 'over-bound') body = {sku:'NW-JKT-100', qty:1};
+  const res = await fetch('/api/checkout', {method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify(body)});
+  const data = await res.json();
+  renderDecision({action:'manual_checkout', sku: body.sku, result: data});
+  await loadCatalog();
+  await loadLedger();
+}
+
+async function resetDemo(){
+  await fetch('/api/reset', {method:'POST'});
+  document.getElementById('decision-output').innerHTML = '';
+  await loadConfig(); await loadCatalog(); await loadLedger();
+}
+
+(async function init(){
+  await loadConfig(); await loadCatalog(); await loadLedger();
+})();
+</script>
+</body>
+</html>
