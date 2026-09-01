@@ -1,0 +1,5 @@
+.env
+audit_log/*.jsonl
+data/catalog.original.json
+__pycache__/
+*.pyc
