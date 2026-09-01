@@ -1,0 +1,68 @@
+{
+  "merchant": {
+    "id": "merchant_demo_001",
+    "name": "Northwind Goods",
+    "currency": "INR",
+    "return_policy": "7 days, unopened",
+    "agent_commerce_version": "0.1"
+  },
+  "products": [
+    {
+      "sku": "NW-BTL-001",
+      "name": "Stainless Steel Water Bottle 1L",
+      "description": "Insulated, keeps cold 24h / hot 12h.",
+      "price_paise": 89900,
+      "stock": 42,
+      "category": "hydration",
+      "attributes": {"capacity_l": 1.0, "material": "stainless_steel", "color": "matte_black"},
+      "agent_purchasable": true,
+      "max_qty_per_order": 5
+    },
+    {
+      "sku": "NW-BTL-002",
+      "name": "Stainless Steel Water Bottle 500ml",
+      "description": "Insulated, compact size for daily carry.",
+      "price_paise": 59900,
+      "stock": 80,
+      "category": "hydration",
+      "attributes": {"capacity_l": 0.5, "material": "stainless_steel", "color": "silver"},
+      "agent_purchasable": true,
+      "max_qty_per_order": 5
+    },
+    {
+      "sku": "NW-BAG-010",
+      "name": "Canvas Tote Bag",
+      "description": "Heavy-duty canvas, reinforced straps.",
+      "price_paise": 45000,
+      "stock": 15,
+      "category": "bags",
+      "attributes": {"material": "canvas", "color": "beige"},
+      "agent_purchasable": true,
+      "max_qty_per_order": 3
+    },
+    {
+      "sku": "NW-MUG-005",
+      "name": "Ceramic Mug 350ml",
+      "description": "Dishwasher safe, minimal design.",
+      "price_paise": 29900,
+      "stock": 0,
+      "category": "kitchen",
+      "attributes": {"capacity_ml": 350, "material": "ceramic"},
+      "agent_purchasable": true,
+      "max_qty_per_order": 6
+    },
+    {
+      "sku": "NW-JKT-100",
+      "name": "Premium Leather Jacket",
+      "description": "Full-grain leather, tailored fit.",
+      "price_paise": 899900,
+      "stock": 5,
+      "category": "apparel",
+      "attributes": {"material": "leather", "size_options": ["S", "M", "L", "XL"]},
+      "agent_purchasable": false,
+      "requires_human_confirmation": true,
+      "agent_purchasable_reason": "high-value item — always requires human confirmation before purchase",
+      "max_qty_per_order": 1
+    }
+  ]
+}
