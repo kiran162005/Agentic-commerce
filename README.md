@@ -1,4 +1,4 @@
-# Agentic Commerce Demo — Track 01
+# PayGate — Agentic Commerce Demo (Track 01)
 
 An agent-readable merchant catalog + a buyer agent that reasons over it within a
 budget + a checkout agent that enforces bounds and gates before any money moves,
